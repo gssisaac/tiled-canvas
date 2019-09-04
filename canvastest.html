@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.flex-container {
+  display: flex;
+  flex-wrap: nowrap;
+  /* background-color: DodgerBlue; */
+}
+
+.flex-container > div {
+  /* background-color: #f1f1f1; */
+  flex-shrink: 0;
+  width: 100px;
+  margin: 0px;
+  text-align: center;
+  line-height: 75px;
+  font-size: 30px;
+}
+
+.tile canvas {
+    opacity: 0;
+    margin-top: 25px;
+    font-size: 21px;
+    text-align: center;
+    -webkit-transition: opacity 2s ease-in;
+    -moz-transition: opacity 2s ease-in;
+    -o-transition: opacity 2s ease-in;
+    -ms-transition: opacity 2s ease-in;
+    transition: opacity 2s ease-in;
+}
+.tile canvas.load {
+    opacity: 1;
+}
+
+</style>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+
+<!-- <canvas id="myCanvas" width="600" height="600" style="border:1px solid #d3d3d3;width:300px;height:300px;">
+Your browser does not support the HTML5 canvas tag.</canvas> -->
+<div id='page'>
+</div>
+
+<script>
+  //var c = document.getElementById("myCanvas");
+  const tile = { width: 400, height: 400 };
+  class Rect {
+    constructor(x, y, w, h) {
+      this.x = x;
+      this.y = y;
+      this.width = w;
+      this.height = h;
+    }
+
+    contains = (x, y) => {
+      return this.x <= x && x <= this.x + this.width &&
+            this.y <= y && y <= this.y + this.height;
+    }
+  }
+
+  $(".tile canvas").addClass("load");
+
+  const createTileCanvas = () => {
+
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('class', 'tile')
+    canvas.setAttribute('width', tile.width*2);
+    canvas.setAttribute('height', tile.height*2);
+    canvas.setAttribute("style","border:1px solid #d3d3d3; width:"+(tile.width)+"px;height:"+(tile.height)+"px;");
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#337755";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = "80px Georgia";
+    ctx.fillText("Hello World!", 10, 340);
+
+    ctx.font = "100px Verdana";
+    // Create gradient
+    var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop("0", "magenta");
+    gradient.addColorStop("0.5", "blue");
+    gradient.addColorStop("1.0", "red");
+    // Fill with gradient
+    ctx.fillStyle = gradient;
+    ctx.fillText("Big smile!", 10, 600);
+    return canvas
+  }
+
+  //const container = document.getElementById("canvas-container")
+
+  for (var row = 0; row < 150; row ++) {
+    const container = document.createElement("div")
+    container.setAttribute('class', 'flex-container')
+    for (var i = 0; i < 5; i++) {
+      //const canvas = createTileCanvas()
+      const canvasWrapper = document.createElement("div")
+      canvasWrapper.setAttribute("style","border:1px solid #d3d3d3; width:"+(tile.width)+"px;height:"+(tile.height)+"px;");
+      canvasWrapper.setAttribute('width', tile.width*2);
+      canvasWrapper.setAttribute('class', 'canvas-wrapper')
+      canvasWrapper.setAttribute('id', `${row}.${i}`)
+      container.appendChild(canvasWrapper);
+    }
+    document.getElementById('page').appendChild(container);
+  }
+
+  window.onscroll = e => {
+    const page = document.getElementById('page')
+    const divs = page.querySelectorAll('.canvas-wrapper')
+    divs.forEach(div => {
+      const screen = new Rect(0, 0, $(window).width(), $(window).height())
+      const rect = div.getBoundingClientRect()
+      let needToCreate = false
+      let needToDelete = false
+
+      if (screen.contains(rect.left, rect.top) || 
+          screen.contains(rect.right, rect.bottom) ||
+          screen.contains(rect.left, rect.bottom) ||
+          screen.contains(rect.right, rect.top)) {
+        if (!div.hasChildNodes()) {
+          needToCreate = true
+        } else {
+          div.childNodes.forEach(child => {
+            if (child.tagName == 'canvas') {
+
+            }
+          })
+        }
+        console.log('inside:', div.id, div.className)
+        // create
+      }
+      else {
+        if (div.hasChildNodes()) {
+          needToDelete = true
+        }
+      }
+
+      //new comer
+      if (needToCreate) {
+        const canvas = createTileCanvas()
+        div.appendChild(canvas)
+      }
+      //deletion
+      else if (needToDelete) {
+        div.innerHTML = ''
+        console.log("deleted", div.id)
+      }
+      
+      // if (rect.left >= 0 && rect.top >= 0 && rect.right <= $(window).width() && rect.bottom <= $(window).height()) {
+      //   console.log('inside:', div.id)
+      // }
+    })
+  }
+
+</script>
+
+
+</body>
+</html>
